@@ -1,3 +1,5 @@
 .config
-venv/
+./venv/
+.idea/
 gallery/
+.DS_Store
