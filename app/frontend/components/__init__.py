@@ -78,6 +78,7 @@ class DirectoryDialog(tk.Tk):
         for d in self.dir_dialog_l:
             if os.path.exists(d.folder_path.get()):
                 CONFIG_FILE.set_config(d.param, d.folder_path.get())
+                print(CONFIG_FILE.get_config('gallery_dir'))
                 return True
             return False
 

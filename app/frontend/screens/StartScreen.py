@@ -22,5 +22,5 @@ class StartPage(tk.Frame):
             self.dir_dialog_l.append(DirectoryDialog(row=i, param=s))
             idx += i
 
-        # Build a Confirm button after the last dialogue
+        # Build a Confirm button after the last dialogue, and pass all earlier dialogues to the confirm button
         self.dir_dialog_l[-1].build_confirm_button(row=idx + 1, column=3, l=self.dir_dialog_l)
