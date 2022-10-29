@@ -36,6 +36,21 @@ class GalleryImage:
         return self.time_created_str
 
 
+class ImageViewImage:
+    def __init__(self, path):
+        self.path = path
+        self.img = Image.open(self.path)
+        self.height = self.img.height
+        self.width = self.img.width
+        self.format = self.img.format
+        self.time_created_str = self.img._getexif()[36867]
+        self.year = int(self.time_created_str[0:4])
+        self.month = int(self.time_created_str[5:7])
+        self.day = int(self.time_created_str[8:10])
+        self.hour = int(self.time_created_str[11:13])
+        self.minute = int(self.time_created_str[14:16])
+
+
 class DirectoryDialog(tk.Tk):
     # *args and **kwargs required for components
     def __init__(self, param, row, *args, **kwargs):

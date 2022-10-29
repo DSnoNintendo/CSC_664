@@ -1,7 +1,9 @@
 import tkinter as tk
 from app.constants import CONFIG_FILE, GALLERY_CARD_SIZE, GALLERY_ROWS, GALLERY_COL
 from PIL import ImageTk, Image
+from app.frontend.components import ImageViewImage
 from app.frontend.frames.gallery import Grid, SortMenu
+from app.frontend.windows import ImageView
 
 
 class GalleryScreen(tk.Frame):
@@ -19,8 +21,8 @@ class GalleryScreen(tk.Frame):
                 scrollregion=self.canvas.bbox("all")
             )
         )
-
-
+        self.image_thumbnails = []
+        self.image_view = None
 
     def build(self):
         self.grid.build()
@@ -29,25 +31,25 @@ class GalleryScreen(tk.Frame):
         self.canvas.pack(side=tk.LEFT, padx=(0, 50))
         self.scrollbar.pack(side=tk.RIGHT, fill='y')
         self.canvas.create_window((0, 0), window=self.grid, anchor="nw")
+        thumbnails = self.grid.get_thumbnails()
+        images = self.grid.get_images()
 
+        for i, thumbnail in enumerate(thumbnails):
+            thumbnail.bind("<Button-1>", lambda e, path=images[i].path: self.open_imageview(path))
 
+    def open_imageview(self, path):
+        if self.image_view:
+            self.image_view.destroy()
 
-    def populate_grid(self):
-        nr = GALLERY_ROWS  # number of rows
-        nc = GALLERY_COL  # number of columns
-        idx = 0
+        self.image_view = ImageView(self, path)
+    '''
+        img_obj = ImageViewImage(path)
+        top = tk.Toplevel(self)
+        top.geometry(f"{img_obj.width}x{img_obj.height}")
+        img = ImageTk.PhotoImage(img_obj.img)
+        lbl = tk.Label(top, image=img)
+        lbl.image = img
+        lbl.pack()
+        top.title("Child Window")
+        '''
 
-        photo_list = []
-
-        for i in range(nr * nc):
-            try:
-                img = ImageTk.PhotoImage(self.images[idx].img)
-            except IndexError:
-                break
-            lbl = tk.Label(self.grid, image=img)
-            lbl.img = img
-            photo_list.append(lbl)
-            photo_list[-1].grid(row=i // nc, column=i % nc)
-            idx += 1
-
-        # Display
