@@ -46,8 +46,8 @@ class FaceFinder:
 
 
                 '''
-                instead of showing the face in a new window we will send a trigger for the gui to display the
-                image 
+                instead of showing the face in a new window we will send a trigger for the gui to display the image 
+                Still trying to figure how to do this...
                 
                 '''
 
