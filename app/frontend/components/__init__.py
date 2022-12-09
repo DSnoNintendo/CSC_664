@@ -1,14 +1,10 @@
-from PIL import ImageTk, Image
-from app.backend.helpers import Config
+from PIL import Image
 from app.constants import CONFIG_FILE
-from colormath.color_objects import LabColor
-from colormath.color_diff import delta_e_cie1976
 import tkinter as tk
 from tkinter import filedialog
 import os
-from datetime import datetime
 from app.constants import GALLERY_CARD_SIZE
-import time
+from datetime import datetime
 
 
 class GalleryImage:
@@ -19,7 +15,10 @@ class GalleryImage:
         self.width = self.img.width
         self.format = self.img.format
         self.img.thumbnail((GALLERY_CARD_SIZE, GALLERY_CARD_SIZE))
-        self.time_created_str = self.img._getexif()[36867]
+        try:
+            self.time_created_str = self.img._getexif()[36867]
+        except (KeyError, TypeError):
+            self.time_created_str = datetime.today().isoformat("/")
         self.year = int(self.time_created_str[0:4])
         self.month = int(self.time_created_str[5:7])
         self.day = int(self.time_created_str[8:10])
@@ -43,7 +42,10 @@ class ImageViewImage:
         self.height = self.img.height
         self.width = self.img.width
         self.format = self.img.format
-        self.time_created_str = self.img._getexif()[36867]
+        try:
+            self.time_created_str = self.img._getexif()[36867]
+        except TypeError:
+            self.time_created_str = datetime.today().isoformat("/")
         self.year = int(self.time_created_str[0:4])
         self.month = int(self.time_created_str[5:7])
         self.day = int(self.time_created_str[8:10])
@@ -101,3 +103,8 @@ class DirectoryDialog(tk.Tk):
         confirm_button = tk.Button(self, text="Confirm", command=self.confirm)
         self.dir_dialog_l = l
         confirm_button.grid(row=row, column=column)
+
+class MenuBar:
+    def __init__(self, root):
+        menu_bar = tk.Menu(root)
+

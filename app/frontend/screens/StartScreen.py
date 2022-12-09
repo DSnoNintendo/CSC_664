@@ -1,7 +1,4 @@
 import tkinter as tk
-from tkinter import ttk
-from tkinter import filedialog
-from app.backend.helpers import Config
 from app.frontend.components import DirectoryDialog
 from app.constants import REQUIRED_CONFIGS
 
@@ -24,3 +21,11 @@ class StartPage(tk.Frame):
 
         # Build a Confirm button after the last dialogue, and pass all earlier dialogues to the confirm button
         self.dir_dialog_l[-1].build_confirm_button(row=idx + 1, column=3, l=self.dir_dialog_l)
+
+    def menubar(self, root):
+        menubar = tk.Menu(root)
+
+        preferences_menu = tk.Menu(menubar, tearoff=0)
+        preferences_menu.add_command(label="Start facial recogniton", command=self.bind())
+        menubar.add_cascade(label="PageOne", menu=preferences_menu)
+        return menubar

@@ -15,6 +15,9 @@ class Grid(tk.Frame):
     def build(self):
         gallery_dir = CONFIG_FILE.get_config('gallery_dir')
         entries = os.listdir(gallery_dir)
+        for entry in entries:
+            if 'props' in entry or entry == '.DS_Store':
+                entries.remove(entry)
 
         if len(entries):
             img_path = f"{gallery_dir}/{entries[0]}"
@@ -22,6 +25,8 @@ class Grid(tk.Frame):
             self.images.append(img)
 
             for entry in entries[1:]:
+                if 'props' in entry or entry == '.DS_Store':
+                    continue
                 img_path = f"{gallery_dir}/{entry}"
                 img = GalleryImage(img_path)
                 self.images.append(img)

@@ -36,7 +36,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--keyword', type=str, required=True)
     parser.add_argument('--max', type=int, nargs='?', const=100, default=100)
-    parser.add_argument('--dest', type=str, nargs='?', const='./gallery/', default='./gallery/')
+    parser.add_argument('--dest', type=str, nargs='?', const='./images/gallery/', default='./images/gallery/')
     args = parser.parse_args()
 
     scraper = Excva8r()
