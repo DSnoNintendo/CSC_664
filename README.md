@@ -17,12 +17,6 @@ install NLTK Data
 foo@bar:CSC_664$ python -m nltk.downloader popular
 ```
 
-
-This will download a maximum of 10 images to a folder named gallery located in the directory.
-(The default directory is ./gallery/ and the default maximum is 10)
-
-You can download pictures of multiple people or groups of people to have more images for facial recognition
-
 ## Run Program
 ```shell
 foo@bar:CSC_664$ python3 main.py

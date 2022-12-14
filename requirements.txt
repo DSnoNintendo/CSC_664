@@ -1,7 +1,5 @@
-colormath==3.0.0
 networkx==2.8.7
 numpy~=1.16.0
-opencv-python==4.6.0.66
 Pillow==9.2.0
 certifi==2021.5.30
 charset-normalizer==2.0.4

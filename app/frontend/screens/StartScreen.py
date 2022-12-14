@@ -13,10 +13,11 @@ class StartPage(tk.Frame):
         self.dir_dialog_l = []
 
     def build(self):
+        print('building')
         idx = 0
         for i, s in enumerate(REQUIRED_CONFIGS):
             # Create a dialog component for every required setting
-            self.dir_dialog_l.append(DirectoryDialog(row=i, param=s))
+            self.dir_dialog_l.append(DirectoryDialog(row=i, param=s, parent=self))
             idx += i
 
         # Build a Confirm button after the last dialogue, and pass all earlier dialogues to the confirm button
