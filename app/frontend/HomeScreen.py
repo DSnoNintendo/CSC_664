@@ -36,7 +36,9 @@ class HomeScreen(ttk.Frame):
         configure_style(self)
 
     def switch_tab_view(self, name):
+        self.event_view.list_view.refresh()
         self.tabview.set(name)
+
 
 
     def menubar(self, root):

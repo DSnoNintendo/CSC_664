@@ -25,6 +25,7 @@ from GPSPhoto import gpsphoto
 from geopy.geocoders import Nominatim
 import eyed3
 from app.FileFinder.Image import Image as ImageFileFinder
+from app.FileFinder.TextDocument import TextDocument as TextFileFinder
 
 
 adapter = Adapter()
@@ -60,10 +61,11 @@ class FileFinder:
         # For tax documents (Ex: Filed Taxes on 06/20/2023)
         # Want to look for all tax documents created from Mid-2022 to 06/20/2023
         if any(substring in self.event_descr_stems for substring in ["tax"]):
+            text_finder = TextFileFinder()
             query = {
                 'required': ['TAX', str(self.dt_obj.year - 1)]
             }
-            self.start_pdf_search(query)  # Find PDFs containing tax and the previous year
+            self.event_files['Text'] = text_finder.start(query)  # Find PDFs containing tax and the previous year
 
         # if people in image defined
         # if location is found look for images
@@ -72,19 +74,17 @@ class FileFinder:
             query = {
                 'people': self.people,
                 'location': self.location,
-                'date': '12/29/2018'
+                'date': self.date
             }
             image_finder.isolate_files_by_date(query['date'])
-            print('searching images')
             self.event_files['Image'] = image_finder.start(query)
-        '''
+
         if any(substring in self.event_descr_stems for substring in ["listen", "album"]):
             print('mp3 search')
             query = {
-                'person': self.person
+                'person': self.people[0]
                 }
-            self.start_mp3_search(query)  # Find PDFs containing tax and the previous year
-        '''
+            self.event_files['MP3'] = self.start_mp3_search(query)  # Find PDFs containing tax and the previous year
         '''
         if any(substring in self.event_descr_stems for substring in ["BUY"]):
             self.find_pdfs([""])
@@ -116,16 +116,9 @@ class FileFinder:
             t.start()
 
     def start_mp3_search(self, qualifiers):
-        file_list = []
-        for root, dirs, files in os.walk(MUSIC_DIR, topdown=False):
-            for file in files:
-                file_list.append(file)
 
-        for l in self.split_list(file_list, 2):
-            list_chunk = np.array(l).tolist()
-            t = threading.Thread(target=lambda: self.find_mp3s(list_chunk, qualifiers))
-            self.threads.append(t)
-            t.start()
+
+        return self.find_mp3s(qualifiers)
 
     def start_image_search(self, qualifiers):
         file_list = []
@@ -176,8 +169,13 @@ class FileFinder:
 
         print('search complete')
 
-    def find_mp3s(self, files, qualifiers):
+    def find_mp3s(self, qualifiers):
         # get all paths from document directory
+        files = []
+        event_files = []
+        for root, dirs, files in os.walk(MUSIC_DIR, topdown=False):
+            for file in files:
+                files.append(file)
 
         for path in files:
             full_path = MUSIC_DIR + '/' + path
@@ -186,9 +184,10 @@ class FileFinder:
                 print(mp3.tag.artist)
                 if self.person in mp3.tag.artist:
                     print(mp3.tag.artist)
-                    self.event_files.append(full_path)
+                    event_files.append(full_path)
 
-        print('search complete')
+        return event_files
+
 
 
     def find_images(self, files, query):

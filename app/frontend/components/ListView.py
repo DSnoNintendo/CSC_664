@@ -60,34 +60,22 @@ class ListView(ctk.CTkFrame):
             #self.add_row(e)
 
         self.row_container.build_scrollbar()
-        self.placeholder = ctk.CTkLabel(self, text='').grid(row=2, column=0)
 
 
     def refresh(self):
         ''' When Refreshing listview, delete all rows and redisplay them by creation date '''
         self.events = adapter.get_all_events()
-        event_rows = self.event_rows.copy()  # copy event row widgets
-        self.event_rows = []  # reset event row widgets to add new ones
-        for widget_list in event_rows:
-            for w in widget_list:
-                w.destroy()
-            #self.row_count -= 2
-
+        self.row_container.__init__(self, self.parent)
+        self.row_container.grid(row=1, column=0)
         for i, e in enumerate(self.events):
-            print('g')
-            #self.add_row(e)
-            #self.row_count += 1
+            row = EventRow(self.row_container.container, self, e, i)
+            self.row_container.insert_row(row, i)
 
-        '''
-            for i, person in enumerate(people):
-                if len(people) == 1:
-                    people_str += person
-                else:
-                    if i != len(people) - 1:  # if not end of list
-                        people_str += f'{person},'
-                    else:
-                        people_str += f'{person}'
-        '''
+            #self.add_row(e)
+
+        self.row_container.build_scrollbar()
+
+
 
 
 class RowContainer(ctk.CTkFrame):

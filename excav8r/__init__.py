@@ -217,9 +217,6 @@ class Excva8r:
         self.driver.get('https://duckduckgo.com/?q=%s&t=hx&va=g&iar=images' % search_term.replace(' ', '+'))
         footer = self.driver.find_element_by_class_name("footer")
 
-        while not footer.is_displayed():
-            self.__scroll()
-            self.__moreDdg()
 
         elements = self.driver.find_elements_by_xpath("//img[contains(@class,'img')]")
 

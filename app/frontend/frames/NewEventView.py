@@ -69,18 +69,19 @@ class NewEventView(ctk.CTkFrame):
         self.destroy_all_widgets()
         self.event_dict = event_props
         image_files = event_files['Image']
-        text_files = event_files['Text']
-        mp3_files = event_files['MP3']
+
         img_lbl = ctk.CTkLabel(self, text="Event Images:", font=('helvetica', 16))
         img_lbl.pack(pady=25)
-        if image_files:
-            images_view = EventImages(self, image_files)
-            images_view.pack()
+        other_files = event_files['Text'] + event_files['MP3']
+
+
+        images_view = EventImages(self, image_files)
+        images_view.pack()
 
         other_files_lbl = ctk.CTkLabel(self, text='Other Event Files:', font=('helvetica', 16))
         other_files_lbl.pack(pady=25)
 
-        file_view = EventFiles(self, text_files)
+        file_view = EventFiles(self, other_files)
         file_view.pack()
 
         confirm_button = ctk.CTkButton(self, text='Confirm', command=lambda: confirm())
@@ -253,8 +254,6 @@ class EventFiles(ctk.CTkFrame):
         self.listbox.pack(side=tk.LEFT, fill=tk.BOTH)
         self.scrollbar = tk.Scrollbar(self)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.BOTH)
-        for values in range(100):
-            self.listbox.insert(tk.END, values)
 
         # Attaching Listbox to Scrollbar
         # Since we need to have a vertical
@@ -266,8 +265,8 @@ class EventFiles(ctk.CTkFrame):
         # we need to have a vertical view
         self.scrollbar.configure(command=self.listbox.yview)
 
-        #for i, path in enumerate(paths):
-            #self.listbox.insert(i, path)
+        for i, path in enumerate(paths):
+            self.listbox.insert(i, path)
 
         self.listbox.bind('<Return>', lambda event: self.open_file())
         self.bind('<Double-Button-1>', lambda e: self.open_file())

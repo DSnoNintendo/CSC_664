@@ -18,7 +18,7 @@ def gallery_as_path_list(path):
 def randomize_mtime(path):
     month = randrange(1,12)
     day = randrange(1,30)
-    year = randrange(2000,2020)
+    year = 2022
     d = datetime(year, month, day, 0, 0)
     epoch = d.timestamp()
     os.utime(path, (epoch, epoch))
