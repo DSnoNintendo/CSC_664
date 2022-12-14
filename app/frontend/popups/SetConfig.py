@@ -6,10 +6,10 @@ from app.constants import REQUIRED_CONFIGS
 LARGEFONT =("Verdana", 35)
 
 
-class SetConfig(tk.Frame):
+class SetConfig(ctk.CTkFrame):
     # This page displays when users first startup program and/or when configurations aren't set
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
+        ctk.CTkFrame.__init__(self, parent, width=300, height=300)
 
         self.dir_dialog_l = []
 

@@ -50,7 +50,7 @@ class GUI(ctk.CTk):
         if CONFIG_FILE.has_required_configs(REQUIRED_CONFIGS):
             self.show_frame(home_screen)
         else:
-            self.show_frame(start_screen)
+            self.show_frame(set_config)
 
     def show_frame(self, cont):
         frame = self.frames[cont]

@@ -55,10 +55,10 @@ class ImageViewImage:
         self.minute = int(self.time_created_str[14:16])
 
 
-class DirectoryDialog(tk.Frame):
+class DirectoryDialog(ctk.CTkFrame):
     # *args and **kwargs required for components
     def __init__(self, param, row, parent):
-        tk.Frame.__init__(self, parent)
+        ctk.CTkFrame.__init__(self, parent)
         """
         Creates dialog for users to select directory
 
@@ -75,13 +75,13 @@ class DirectoryDialog(tk.Frame):
         self.dir_dialog_l = []
 
         self.setting_label = ctk.CTkLabel(self, text=f"{param}:")
-        self.setting_label.grid(row=row, column=1)
+        self.setting_label.grid(row=row, column=1, sticky='nswe')
 
         self.browse_button = ctk.CTkButton(self, text="Browse", command=self.browse)
-        self.browse_button.grid(row=row, column=2)
+        self.browse_button.grid(row=row, column=2, sticky='nswe')
 
-        self.dir_label = tk.Label(self, text=" ")
-        self.dir_label.grid(row=row, column=3)
+        self.dir_label = ctk.CTkLabel(self, text=" ")
+        self.dir_label.grid(row=row, column=3, sticky='nswe')
 
     def browse(self):
         # Allow user to select a directory and store it in global var
