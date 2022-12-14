@@ -12,7 +12,7 @@ should be easily accessible through this UI, as close to the date the photo was 
 ```shell
 foo@bar:CSC_664$ pip install -r requirements.txt
 ```
-If you have a dlib installation error, download a dlib .whl for you machine from https://pypi.org/simple/dlib/ and run
+If you have a dlib installation error, download a dlib .whl for you machine from 'https://pypi.org/simple/dlib/' and run
 ```shell
 foo@bar:CSC_664$ pip install cmake
 ```

@@ -1,5 +1,4 @@
 .config
-venv/
 .idea/
 images/gallery/
 .DS_Store
