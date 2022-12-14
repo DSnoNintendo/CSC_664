@@ -9,17 +9,18 @@ LARGEFONT =("Verdana", 35)
 class SetConfig(ctk.CTkFrame):
     # This page displays when users first startup program and/or when configurations aren't set
     def __init__(self, parent, controller):
-        ctk.CTkFrame.__init__(self, parent, width=300, height=300)
-
+        ctk.CTkFrame.__init__(self, parent)
+        self.controller = controller
         self.dir_dialog_l = []
 
     def build(self):
         idx = 0
         for i, s in enumerate(REQUIRED_CONFIGS):
+            self.rowconfigure(i, minsize=100)
             # Create a dialog component for every required setting
-            ddl = DirectoryDialog(row=i, param=s, parent=self)
+            ddl = DirectoryDialog(row=i, param=s, parent=self, controller=self.controller)
             self.dir_dialog_l.append(ddl)
-            ddl.pack()
+            ddl.grid(row=i, column=0, sticky='e', pady=25)
             idx += i
 
         # Build a Confirm button after the last dialogue, and pass all earlier dialogues to the confirm button
