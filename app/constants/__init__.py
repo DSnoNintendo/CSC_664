@@ -15,8 +15,8 @@ WINDOW_HEIGHT = get_monitors()[0].height
 
 # Config settings required for program to run correctly
 REQUIRED_CONFIGS = ['gallery_dir',  # IMAGE GALLERY DIRECTORY
-                    'document_dir' # Directory for Documents
-                    #
+                    'document_dir', # Directory for text Documents
+                    'music_dir',  # Directory for music
                     ]
 
 GALLERY_DIR = CONFIG_FILE.get_config('gallery_dir')

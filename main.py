@@ -2,6 +2,7 @@ import app
 from app.frontend.components import MenuBar
 import nltk
 import ssl
+
 '''
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -12,5 +13,6 @@ else:
 
 nltk.download()
 '''
+
 program = app.start()
 program.mainloop()

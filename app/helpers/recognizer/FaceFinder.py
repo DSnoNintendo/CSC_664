@@ -99,9 +99,7 @@ class FaceFinder:
         self.db = db_adapter.Adapter()
 
 
-    def crop_face(self, img, x, y, w, h): # renamed to crop_face
-        cropped_image = img[y:y + h, x:x + w]
-        return cropped_image
+
 
     def add_person_to_prop_file(self, path, name):
         prop_file = get_or_create_img_props(path)

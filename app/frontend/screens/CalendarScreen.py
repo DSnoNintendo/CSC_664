@@ -9,10 +9,11 @@ from itertools import count, cycle
 from .constants import CALENDAR_CELL_WIDTH, CALENDAR_CELL_HEIGHT
 from app.constants import CWD, MUSIC_DIR, WINDOW_HEIGHT, WINDOW_WIDTH
 from app.backend.db_adapter import Adapter
+from app.frontend.frames import SortMenu
 from urllib3.connectionpool import xrange
 from dateutil.relativedelta import relativedelta
-from app.helpers.recognizer import start_filefinder
 from app.helpers import get_unique
+from app.frontend.helpers import configure_style
 import tkcalendar
 import subprocess, os, platform
 import math
@@ -34,46 +35,15 @@ class CalendarScreen(ttk.Frame):
         self.nav.build()
         self.event_view.build()
         self.nav.grid(row=0, column=0, sticky='nswe', columnspan=2)
-        self.rowconfigure(0, minsize=WINDOW_HEIGHT*0.03)
+        self.rowconfigure(0, minsize=WINDOW_HEIGHT*0.03)  # Set nav to 3% of window
         self.event_view.grid(row=1, column=1)
         self.sort_menu.grid(row=1, column=0, sticky='nwe')
 
         # self.style.configure('TButton', font=('Helvetica', 12))
-
-        self.style.configure('EventView.TFrame', background="#add8e6")
-        self.style.configure('Weekday.TLabel', background='white', borderwidth=7)
-        self.style.configure('Weekday.TFrame', background='white')
-
-        self.style.configure('Nav.TFrame',
-                             background="white")
-        self.style.map('CalendarTileNoEvent.TFrame',
-                       background=[('!active', 'grey'), ('active', '#b4e3fb')])
-        self.style.map('CalendarTileNoEventHOVER.TFrame',
-                       background=[('!active', '#b4e3fb'), ('active', '#b4e3fb')])
-        self.style.configure('CalendarTileNoEvent.TLabel',
-                             background='grey')
-        self.style.configure('CalendarTileYesEvent.TFrame',
-                             background='#65a1c2')
-        self.style.configure('CalendarTileYesEvent.TLabel',
-                             background='#65a1c2')
-        self.style.configure('CalendarHeaderMonth.TLabel',
-                             background='white',
-                             font=('Helvetica', 16))
-        self.style.configure("CalendarHeader.TFrame",
-                             width=CALENDAR_CELL_WIDTH*10)
-        self.style.configure("EventParam.TButton",
-                             relief='flat', padding=(0,0,0,0), height=0, width=0)
+        configure_style(self)
 
     def menubar(self, root):
-        menubar = tk.Menu(root)
-
-        preferences_menu = tk.Menu(menubar, tearoff=0)
-        preferences_menu.add_command(label="Start facial recogniton", command=lambda: start_facefinder(self,
-                                                                                                       self.controller,
-                                                                                                       self.parent))
-        menubar.add_cascade(label="Actions"
-                                  "", menu=preferences_menu)
-        return menubar
+        return "f"
 
 
 class Nav(ttk.Frame):
@@ -100,8 +70,6 @@ class Nav(ttk.Frame):
             self.container.show_list_view()
             self.view_button["text"] = "□"
 
-    def new_event(self):
-        event_view = NewEventView(self, self.controller)
 
 
 class EventView(ttk.Frame):
@@ -122,223 +90,6 @@ class EventView(ttk.Frame):
         self.calendar.pack_forget()
         self.list_view.refresh()
         self.list_view.pack()
-
-
-class SortMenu(ttk.Frame):
-    class DateListBox(ttk.Frame):
-        def __init__(self, parent):
-            def on_click(event):
-                selection = event.widget.curselection()
-                if selection:
-                    index = selection[0]
-                    data = event.widget.get(index)
-                    #self.event_view.refresh(data)
-
-            ttk.Frame.__init__(self, parent)
-            self.listbox = tk.Listbox(self, height=4,
-                                      width=15,
-                                      bg="grey",
-                                      activestyle='dotbox',
-                                      font="Helvetica",
-                                      fg="black")
-            self.listbox.grid(row=0,column=0)
-            self.listbox.insert(0, "Event: New to Old")
-            self.listbox.insert(1, "Event: Old to New")
-            self.listbox.insert(2, "Creation: Old to New")
-            self.listbox.insert(3, "Creation: New to Old")
-            self.listbox.selection_set(0)
-            self.listbox.bind('<<ListboxSelect>>', on_click)
-            # self.event_view = parent.parent.event_view
-
-    class PeopleListBox(ttk.Frame):
-        def __init__(self, parent):
-            def on_click(event):
-                selection = event.widget.curselection()
-                if selection:
-                    index = selection[0]
-                    data = event.widget.get(index)
-                    #self.event_view.refresh(data)
-
-            def get_events():
-                events = adapter.get_all_events()
-                people = []
-                for e in events:
-                    try:
-                        p = e['people']
-                        if p in people:
-                            continue
-                        people.append(p)
-                    except KeyError:
-                        pass
-                return people
-
-            ttk.Frame.__init__(self, parent)
-            self.listbox = tk.Listbox(self, height=2,
-                                      width=15,
-                                      bg="grey",
-                                      activestyle='dotbox',
-                                      font="Helvetica",
-                                      fg="black")
-            self.listbox.grid(row=0,column=0)
-            people_list = get_events()
-            if len(people_list):
-                for i, person in enumerate(people_list):
-                    self.listbox.insert(i, person)
-            else:
-                self.listbox.insert(0, "No people detected")
-
-            self.listbox.bind('<<ListboxSelect>>', on_click)
-
-
-            # self.event_view = parent.parent.event_view
-
-
-    class SortContainer(ttk.Frame):
-        def __init__(self, parent, controller):
-            ttk.Frame.__init__(self, parent)
-            event_date_lbl = tk.Label(self, text="Date:")
-            event_date_lbl.grid(row=1, column=0)
-            event_date_listbox = parent.DateListBox(self)
-            event_date_listbox.grid(row=2, column=0, sticky="nswe")
-            people_lbl = tk.Label(self, text="People:")
-            people_lbl.grid(row=5, column=0)
-            people_listbox = parent.PeopleListBox(self)
-            people_listbox.grid(row=6, column=0)
-
-
-    def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
-        self.width = WINDOW_WIDTH * 0.1
-        sort_by_lbl = tk.Label(self, text="Sort By:", font='underline')
-        sort_by_lbl.grid(row=0, column=0, sticky="n")
-        date_sortbox = self.SortContainer(self, parent)
-        date_sortbox.grid(row=1, column=0, pady=(5, 0))
-
-
-class NewEventView(ttk.Frame):
-    def __init__(self, parent, controller):
-        # PARENT - NEW EVENT VIEW
-        ttk.Frame.__init__(self, parent)
-        self.widgets = []
-        self.parent = parent
-        self.top = tk.Toplevel(parent)
-        self.top.wm_geometry("375x250")
-        self.today = datetime.datetime.today()
-        self.descr_lbl = tk.Label(self.top, text="Description:")
-        self.descr_lbl.grid(row=1, column=0)
-        self.widgets.append(self.descr_lbl)
-        self.descr = tk.StringVar(self)
-        self.descr_entry = tk.Entry(self.top, bd=5, textvariable=self.descr)
-        self.descr_entry.grid(row=1, column=1)
-        self.widgets.append(self.descr_entry)
-
-        self.date_lbl = tk.Label(self.top, text="Date:")
-        self.date_lbl.grid(row=2, column=0)
-        self.widgets.append(self.date_lbl)
-        self.date_calendar = tkcalendar.Calendar(self.top, selectmode='day', year=self.today.year,
-                                                 month=self.today.month, day=self.today.day, date_pattern='MM/dd/yyyy')
-        self.date_calendar.grid(row=2, column=1)
-
-        self.param_view = self.EventParams(self.top, self.descr)
-        self.param_view.grid(row=4, column=0, columnspan=3, sticky='w')
-        self.descr_entry.bind('<Return>', lambda e: self.param_view.start_analysis_thread())
-        self.widgets.append(self.param_view)
-
-        self.confirm_btn = tk.Button(self.top, text="Confirm", command=lambda: self.start_event_creation())
-        self.confirm_btn.grid(row=5, column=3, pady=3, padx=3)
-        self.widgets.append(self.confirm_btn)
-
-    def start_event_creation(self):
-        event_props = dict()
-        event_props['description'] = self.descr.get()
-        event_props['date'] = self.date_calendar.get_date()
-        event_props['location'] = self.param_view.get_location()
-        event_props['people'] = self.param_view.get_people()
-        start_filefinder(self, self.parent, event_props)
-        self.date_calendar.destroy()
-        for w in self.widgets:
-            w.destroy()
-        loading_img = ImageLabel(self.top)
-        loading_img.pack()
-        loading_img.load(f'{CWD}/images/src/loading.gif')
-        self.widgets.append(loading_img)
-        loading_label = tk.Label(self.top, text="Searching for media associated with event...")
-        loading_label.pack()
-        self.widgets.append(loading_label)
-
-    def after_event_creation(self, events_props):
-        # After event is created, destroy this window and navigate to month of event on Calendar
-        # NAV -> SCREEN -> CONTAINER -> SET VIEW -> DATE
-        view_container = self.parent.parent.event_view
-        #view_container.show_calendar()
-        view_container.list_view.refresh()
-        view_container.show_list_view()
-
-
-        #view_container.calendar.calendar_nav.set_month(events_props['date'])
-        self.destroy()
-
-    class EventParams(ttk.Frame):
-        def __init__(self, parent, stringvar):
-            ttk.Frame.__init__(self, parent)
-            self.name_label = tk.Label(self, text='person detected:', fg='green')
-            self.location_label = tk.Label(self, text='place detected:', fg='green')
-            self.sv = stringvar
-            self.buttons = []
-            self.description = ""
-            self.location = None
-            self.people = None
-
-            stringvar.trace("w", lambda name, index, mode,
-                                        sv=self.sv: self.set_string())
-
-        def start_analysis_thread(self):
-            print('starting analysis')
-            print(self.sv.get())
-            t = threading.Thread(target=lambda: self.analyze(self.description))
-
-            t.start()
-
-        def set_string(self):
-            print("setting")
-            self.description = self.sv.get()
-            print(self.description)
-
-        def analyze(self, s):
-            for b in self.buttons:
-                b.destroy()
-            dict = get_unique(s)
-            people = dict['people']
-            location = dict['location']
-            if len(people):
-                self.create_name_lbl(people)
-
-            if len(location):
-                self.create_location_lbl(location)
-
-        def create_name_lbl(self, l):
-            self.name_label.grid(row=0, column=0)
-            col = 1
-            for i, name in enumerate(l):
-                name_btn = ttk.Button(self, text=name, style="EventParam.TButton")
-                name_btn.grid(row=0, column=col, ipady=0, ipadx=0, pady=0, padx=0)
-                col += 1
-                self.buttons.append(name_btn)
-                self.people = name
-
-        def create_location_lbl(self, loc):
-            self.location_label.grid(row=1, column=0)
-            col = 1
-            location_btn = ttk.Button(self, text=loc, style="EventParam.TButton")
-            location_btn.grid(row=1, column=col, ipady=0, ipadx=0, pady=0, padx=0)
-            self.buttons.append(location_btn)
-            self.location = loc
-
-        def get_location(self):
-            return self.location
-
-        def get_people(self):
-            return self.people
 
 
 class LoadingScreen(ttk.Frame):

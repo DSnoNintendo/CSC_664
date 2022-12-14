@@ -1,11 +1,11 @@
 import tkinter as tk
-from app.frontend.frames.gallery import SortMenu
 from app.frontend.windows import ImageView
 from app.helpers.recognizer import start_facefinder
 from app.constants import CONFIG_FILE, GALLERY_CARD_SIZE, GALLERY_ROWS, GALLERY_COL
 import os
 from PIL import ImageTk, Image
 from app.frontend.components import GalleryImage
+from app.frontend.frames import SortMenu
 
 
 class GalleryScreen(tk.Frame):
@@ -14,7 +14,7 @@ class GalleryScreen(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.parent = parent
         self.controller = controller
-        self.sort_menu = SortMenu.SortMenu(self, controller)
+        self.sort_menu = SortMenu(self, controller)
         self.canvas = tk.Canvas(self, width=GALLERY_COL*GALLERY_CARD_SIZE, height=GALLERY_ROWS*GALLERY_CARD_SIZE)
         self.grid = Grid(self, controller)
         self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)

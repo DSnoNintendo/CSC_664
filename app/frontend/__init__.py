@@ -3,17 +3,23 @@ from tkinter import ttk
 from .screens import screen_list, start_screen, gallery_screen, calendar_screen
 from app.constants import REQUIRED_CONFIGS, CONFIG_FILE
 from app.helpers import make_label
+from .HomeScreen import HomeScreen
+from .popups import SetConfig
+import customtkinter as ctk
 
 LARGEFONT =("Verdana", 35)
 
 
-class GUI(tk.Tk):
+class GUI(ctk.CTk):
     # start app
     def __init__(self, *args, **kwargs):
         # __init__ function for class Tk
-        tk.Tk.__init__(self, *args, **kwargs)
+        ctk.CTk.__init__(self, *args, **kwargs)
         s = ttk.Style()
-        s.theme_use('classic')
+
+        #s.theme_use('classic')
+        ctk.set_appearance_mode("dark")
+        self.title("Event Grouper")
 
         # creating a container
         container = tk.Frame(self)
@@ -23,6 +29,11 @@ class GUI(tk.Tk):
 
         # frame map
         self.frames = {}
+
+        home_screen = HomeScreen
+        set_config = SetConfig
+        screen_list.append(home_screen)
+        screen_list.append(set_config)
 
         # iterating through a tuple consisting
         # of the different page layouts
@@ -37,10 +48,8 @@ class GUI(tk.Tk):
             frame.pack()
 
         if CONFIG_FILE.has_required_configs(REQUIRED_CONFIGS):
-            print('available')
-            self.show_frame(calendar_screen)
+            self.show_frame(home_screen)
         else:
-
             self.show_frame(start_screen)
 
     def show_frame(self, cont):

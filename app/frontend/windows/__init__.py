@@ -1,10 +1,10 @@
 import tkinter as tk
+import customtkinter as ctk
 from PIL import ImageTk, Image
 from app.frontend.components import ImageViewImage
 from app.constants import IMG_PROP_DIR
 from app.helpers import Config
 import os
-from app.frontend.frames.gallery import Grid, SortMenu
 
 '''
 Module for popup windows that aren't the main GUI.
@@ -82,3 +82,54 @@ class FaceView:
     def destroy(self):
         self.top.destroy()
         self.top.update()
+
+
+class FaceFoundWindow(ctk.CTkToplevel):
+    def radio_event(self):
+        print(self.radio_var.get())
+        if self.radio_var.get() == 0:
+            self.radio_btn.deselect()
+        if self.radio_var.get() == 1:
+            self.radio_btn.select()
+
+    def __init__(self, parent, image):
+        ctk.CTkToplevel.__init__(self, parent)
+        self.geometry('450x450')
+        self.widgets = []
+        self.name = None
+
+
+        l1 = ctk.CTkLabel(self, text='A face in an image that may be associated with your event has been found. Specify '
+                                     'or click Skip', wraplength=425, anchor=tk.CENTER)
+        l1.grid(row=0, column=0, padx=5, pady=25, sticky='news')
+        img = ImageTk.PhotoImage(image)
+        image_lbl = ctk.CTkLabel(self, image=img, text='', anchor=tk.CENTER)
+        image_lbl.grid(row=1, column=0, padx=5, pady=(0, 25))
+        self.name_entry = ctk.CTkEntry(self, placeholder_text="Name")
+        self.name_entry.grid(row=3, column=0, padx=5, pady=5)
+        self.radio_var = tk.IntVar()
+        self.radio_var.set(0)
+        self.widgets.append(self.radio_var)
+        #self.radio_btn = ctk.CTkCheckBox(self, text='This is me', text_color='white',
+        #                                 onvalue=1, offvalue=0, variable=self.radio_var)
+        #self.widgets.append(self.radio_btn)
+        #self.radio_btn.deselect()
+        #self.radio_btn.grid(row=2, column=0, pady=5)
+        confirm = ctk.CTkButton(self, text='Confirm', command=lambda: self.confirm())
+        confirm.grid(row=4, column=0, sticky='w', padx=(50, 0), pady=(25, 0))
+        skip_button = ctk.CTkButton(self, text='Skip', command=lambda: self.skip())
+        skip_button.grid(row=4,column=0, sticky='e', padx=(0, 50), pady=(25,0))
+
+    def show(self):
+        self.wm_protocol("WM_DELETE_WINDOW", self.destroy)
+        self.wait_window()
+        return self.name
+
+
+    def confirm(self):
+        self.name = self.name_entry.get()
+        if self.name:
+            self.destroy()
+
+    def skip(self):
+        self.destroy()

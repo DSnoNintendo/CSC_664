@@ -1,10 +1,12 @@
 from PIL import Image
 from app.constants import CONFIG_FILE
 import tkinter as tk
+import customtkinter as ctk
 from tkinter import filedialog
 import os
 from app.constants import GALLERY_CARD_SIZE
 from datetime import datetime
+from .ListView import TableHeader
 
 
 class GalleryImage:
@@ -53,10 +55,10 @@ class ImageViewImage:
         self.minute = int(self.time_created_str[14:16])
 
 
-class DirectoryDialog(tk.Tk):
+class DirectoryDialog(tk.Frame):
     # *args and **kwargs required for components
-    def __init__(self, param, row, *args, **kwargs):
-        tk.Tk.__init__(self, *args, **kwargs)
+    def __init__(self, param, row, parent):
+        tk.Frame.__init__(self, parent)
         """
         Creates dialog for users to select directory
 
@@ -70,12 +72,12 @@ class DirectoryDialog(tk.Tk):
         """
         self.param = param
         self.folder_path = tk.StringVar()
-        self. dir_dialog_l = []
+        self.dir_dialog_l = []
 
-        self.setting_label = tk.Label(self, text=f"{param}:")
+        self.setting_label = ctk.CTkLabel(self, text=f"{param}:")
         self.setting_label.grid(row=row, column=1)
 
-        self.browse_button = tk.Button(self, text="Browse", command=self.browse)
+        self.browse_button = ctk.CTkButton(self, text="Browse", command=self.browse)
         self.browse_button.grid(row=row, column=2)
 
         self.dir_label = tk.Label(self, text=" ")

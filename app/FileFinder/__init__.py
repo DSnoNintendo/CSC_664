@@ -1,3 +1,8 @@
+from . import TextDocument
+from . import MP3
+from . import Image
+
+
 import threading
 import tkinter as tk
 from tkinter import ttk
@@ -19,48 +24,60 @@ import PIL.ExifTags
 from GPSPhoto import gpsphoto
 from geopy.geocoders import Nominatim
 import eyed3
+from app.FileFinder.Image import Image as ImageFileFinder
 
 
 adapter = Adapter()
 geolocator = Nominatim(user_agent="geoapiExercises")
+
+
+def start_filefinder(parent, controller, event_props):
+    file_finder = FileFinder(parent, controller, event_props)
+    t1 = threading.Thread(target=lambda: file_finder.start())
+    t1.start()
+    print('starting file_finder')
+
 
 class FileFinder:
     def __init__(self, parent, controller, event_props):
         self.parent = parent
         self.controller = controller
         self.event_props = event_props
-        print(event_props)
-        self.person = event_props['people']
+        self.people = event_props['people']
         self.location = event_props['location']
         self.event_descr = self.event_props['description'].upper()
         self.event_descr_stems = self.stem(self.event_descr)
         self.dt_obj = datetime.strptime(self.event_props['date'], '%m/%d/%Y').date()
         self.date = self.event_props['date']
-        self.event_files = []
+        self.event_files = {
+            'Text': [],
+            'MP3': [],
+            'Image': {},
+        }
         self.threads = []
-
 
     def start(self):
         # For tax documents (Ex: Filed Taxes on 06/20/2023)
         # Want to look for all tax documents created from Mid-2022 to 06/20/2023
-        print(self.event_descr_stems)
         if any(substring in self.event_descr_stems for substring in ["tax"]):
             query = {
                 'required': ['TAX', str(self.dt_obj.year - 1)]
-                }
+            }
             self.start_pdf_search(query)  # Find PDFs containing tax and the previous year
 
         # if people in image defined
         # if location is found look for images
-        print(self.location)
         if self.location:
+            image_finder = ImageFileFinder(self.parent)
             query = {
-                'person': self.person,
+                'people': self.people,
                 'location': self.location,
+                'date': '12/29/2018'
             }
+            image_finder.isolate_files_by_date(query['date'])
             print('searching images')
-            self.start_image_search(query)
-
+            self.event_files['Image'] = image_finder.start(query)
+        '''
         if any(substring in self.event_descr_stems for substring in ["listen", "album"]):
             print('mp3 search')
             query = {
@@ -68,7 +85,7 @@ class FileFinder:
                 }
             self.start_mp3_search(query)  # Find PDFs containing tax and the previous year
         '''
-
+        '''
         if any(substring in self.event_descr_stems for substring in ["BUY"]):
             self.find_pdfs([""])
         if any(substring in self.event_descr_stems for substring in ["SELL"]):
@@ -77,21 +94,20 @@ class FileFinder:
             self.find_pdfs([""])
         if any(substring in self.event_descr_stems for substring in ["WATCH"]):
             self.find_videos([""])
-            '''
+        '''
 
         for t in self.threads:
             t.join()
 
+        self.parent.display_event_files(self.event_files, self.event_props)
+        # event_file_view = EventFileView(self.parent, self.controller, self.event_props)
 
-        self.event_props['files'] = self.event_files
-        event_file_view = EventFileView(self.parent, self.controller, self.event_props)
 
     def start_pdf_search(self, qualifiers):
         file_list = []
         for root, dirs, files in os.walk(DOCUMENT_DIR, topdown=False):
             for file in files:
                 file_list.append(os.path.join(file))
-
 
         for l in self.split_list(file_list, 4):
             list_chunk = np.array(l).tolist()
@@ -105,23 +121,21 @@ class FileFinder:
             for file in files:
                 file_list.append(file)
 
-
         for l in self.split_list(file_list, 2):
             list_chunk = np.array(l).tolist()
             t = threading.Thread(target=lambda: self.find_mp3s(list_chunk, qualifiers))
             self.threads.append(t)
             t.start()
 
-
     def start_image_search(self, qualifiers):
         file_list = []
-        for root, dirs, files in os.walk(GALLERY_DIR, topdown=False):
+        for dirpath, subdir, files in os.walk(GALLERY_DIR, topdown=False):
             for file in files:
-                file_list.append(file)
+                path = os.path.join(dirpath, file)
+                file_list.append(path)
 
-        for l in self.split_list(file_list, 1):
+        for l in self.split_list(file_list, 2):
             list_chunk = np.array(l).tolist()
-            print(list_chunk)
             t = threading.Thread(target=lambda: self.find_images(list_chunk, qualifiers))
             self.threads.append(t)
             t.start()
@@ -236,10 +250,9 @@ class FileFinder:
 
 
         for path in files:
-            full_path = GALLERY_DIR + '/' + path
-            print(full_path)
-            if pathlib.Path(full_path).suffix == '.jpg' or pathlib.Path(full_path).suffix == '.jpeg':
-                img = PIL.Image.open(full_path)
+            print(GALLERY_DIR)
+            if pathlib.Path(path).suffix == '.jpg' or pathlib.Path(path).suffix == '.jpeg':
+                img = PIL.Image.open(path)
                 try:
                     exif = {
                         PIL.ExifTags.TAGS[k]: v
@@ -248,17 +261,17 @@ class FileFinder:
                     }
                     if created_on(self.dt_obj, exif):
                         print('Hi')
-                        location = gpsphoto.getGPSData(full_path)
+                        location = gpsphoto.getGPSData(path)
                         latitude, longitude = (location['Latitude'], location['Longitude'])
                         geodata = geolocator.reverse(f"{latitude}, {longitude}")
                         print(geodata)
                         print(query['location'])
-                        print(full_path)
+                        print(path)
                         if query['location'] in str(geodata):
-                            self.event_files.append(full_path)
+                            self.event_files.append(path)
 
                 except Exception as e:
-                    print(full_path, e)
+                    print(path, e)
                     continue
 
 

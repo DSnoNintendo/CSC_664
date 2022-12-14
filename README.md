@@ -7,17 +7,16 @@ together. If a photo with David is selected in the photo gallery text messages b
 should be easily accessible through this UI, as close to the date the photo was taken as possible 
 
 # How to use
-This program is currently being built using celebrity images scraped scraped from DuckDuckGo. Users can download images
-using the [Excav8r](https://github.com/DSnoNintendo/excav8r.py) library included in this directory
+
 ## Install requirements
 ```shell
 foo@bar:CSC_664$ pip install -r requirements.txt
 ```
-
-## Download gallery images
+install NLTK Data
 ```shell
-foo@bar:CSC_664$ python3 get_images.py --keyword "samuel l jackson" --max 10 --dest './gallery/'
+foo@bar:CSC_664$ python -m nltk.downloader popular
 ```
+
 
 This will download a maximum of 10 images to a folder named gallery located in the directory.
 (The default directory is ./gallery/ and the default maximum is 10)

@@ -11,7 +11,6 @@ class Adapter:
         self.face_db.insert({name: encoding})
 
     def get_all_encodings(self):
-        print(self.face_db.all())
         return self.face_db.all()
 
     def get_events(self, date):

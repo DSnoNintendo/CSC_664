@@ -67,5 +67,3 @@ class Gallery(ScrollableFrame):
             photo_list.append(lbl)
             photo_list[-1].grid(row=i // nc, column=i % nc)
             idx += 1
-
-        # Display
